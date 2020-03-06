@@ -637,11 +637,18 @@ std::vector<GCode::LayerToPrint> GCode::collect_layers_to_print(const PrintObjec
                                || (layer_to_print.support_layer && layer_to_print.support_layer->has_extrusions());
 
             if (has_extrusions && layer_to_print.print_z() > maximal_print_z + 2. * EPSILON)
-                throw std::runtime_error(_(L("Empty layers detected, the output would not be printable.")) + "\n\n" +
-                    _(L("Object name")) + ": " + object.model_object()->name + "\n" + _(L("Print z")) + ": " +
-                    std::to_string(layers_to_print.back().print_z()) + "\n\n" + _(L("This is "
-                    "usually caused by negligibly small extrusions or by a faulty model. Try to repair "
-                    "the model or change its orientation on the bed.")));
+                throw std::runtime_error((boost::format("%1%\n\n%2%: %3%\n%4%: %5%\n\n%6%")
+                             % _(L("Empty layers detected, the output would not be printable."))
+                             % _(L("Object name"))
+                             % object.model_object()->name
+                             % _(L("Print z"))
+                             % std::to_string(layers_to_print.back().print_z())
+                             % _(L("This is usually caused by negligibly small "
+                                 "extrusions or by a faulty model. Try to repair "
+                                 "the model or change its orientation on the bed."))
+                             ).str());
+
+
             // Remember last layer with extrusions.
             last_extrusion_layer = &layers_to_print.back();
         }
